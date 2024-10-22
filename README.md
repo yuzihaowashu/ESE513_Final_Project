@@ -1,3 +1,6 @@
+# This repository is adapted from https://github.com/kanglin755/plug_and_play_admm.git. 
+# We studied and modified for academic purposes. 
+
 # Plug and Play ADMM
 This repository provides a simple Pytorch implementation of plug and play ADMM with examples.
 
@@ -14,3 +17,5 @@ The notebook `denoiser_training.ipynb` contains code for training a denoiser fro
 
 References:<br>
 S. Venkatakrishnan, C. Bouman, and B. Wohlberg, “Plug-and-play priors for model based reconstruction,” in *Proc. IEEE Global Conference on Signal and Information Processing*, 2013, pp. 945–948.
+
+
