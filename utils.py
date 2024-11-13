@@ -52,6 +52,7 @@ class ImagenetDataset(Dataset):
         self.train_transform = pth_transforms.Compose([      
             pth_transforms.Resize(480),
             pth_transforms.GaussianBlur(kernel_size=3, sigma=1),
+            #pth_transforms.GaussianBlur(kernel_size=1, sigma=1),
             pth_transforms.RandomCrop(128),
             pth_transforms.ToTensor(),             
             ])
@@ -59,6 +60,7 @@ class ImagenetDataset(Dataset):
         self.test_transform = pth_transforms.Compose([      
             pth_transforms.Resize(480),
             pth_transforms.GaussianBlur(kernel_size=3, sigma=1),
+            #pth_transforms.GaussianBlur(kernel_size=1, sigma=1),
             pth_transforms.CenterCrop(128),
             pth_transforms.ToTensor(),             
             ])
