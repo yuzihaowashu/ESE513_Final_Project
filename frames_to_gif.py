@@ -4,8 +4,9 @@ import imageio.v2 as imageio  # Import imageio.v2 to maintain compatibility
 import argparse
 
 def frames_to_gif(frames_folder, output_gif_path, fps=10):
+    # Sort images by extracting numeric values from filenames
     images = [img for img in os.listdir(frames_folder) if img.lower().endswith((".jpg", ".jpeg", ".png", ".bmp"))]
-    images.sort()
+    images.sort(key=lambda x: int(''.join(filter(str.isdigit, x))) if any(char.isdigit() for char in x) else x)
 
     if not images:
         print(f"No images found in {frames_folder}.")
