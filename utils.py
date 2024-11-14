@@ -5,6 +5,7 @@ import PIL.Image as Image
 import torchvision.transforms as pth_transforms
 import matplotlib.pyplot as plt
 
+
 def conv2d_from_kernel(kernel, channels, device, stride=1):
     """
     Returns nn.Conv2d and nn.ConvTranspose2d modules from 2D kernel, such that 

@@ -52,6 +52,7 @@ def denoise_seq_fastdvdnet(seq, model_temporal):
 	noise_std = torch.FloatTensor([noise_sigma]).to(device)
 	temp_psz = 5
 
+
 	# init arrays to handle contiguous frames and related patches
 	numframes, C, H, W = seq.shape
 	ctrlfr_idx = int((temp_psz-1)//2)

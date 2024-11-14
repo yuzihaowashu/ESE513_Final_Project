@@ -7,7 +7,7 @@ import os
 from os import listdir
 from os.path import isfile, join
 import argparse
-
+ 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('--working_dir', type=str, required=True, help='working directory')
