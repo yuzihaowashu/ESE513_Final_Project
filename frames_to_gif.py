@@ -1,11 +1,11 @@
 import os
 import sys
-import imageio
+import imageio.v2 as imageio  # Import imageio.v2 to maintain compatibility
 import argparse
 
 def frames_to_gif(frames_folder, output_gif_path, fps=10):
-    images = [img for img in os.listdir(frames_folder) if img.endswith((".jpg", ".jpeg", ".png", ".bmp"))]
-    images.sort() 
+    images = [img for img in os.listdir(frames_folder) if img.lower().endswith((".jpg", ".jpeg", ".png", ".bmp"))]
+    images.sort()
 
     if not images:
         print(f"No images found in {frames_folder}.")
@@ -16,7 +16,11 @@ def frames_to_gif(frames_folder, output_gif_path, fps=10):
         frame_path = os.path.join(frames_folder, image_name)
         frame = imageio.imread(frame_path)
         frames.append(frame)
-    imageio.mimsave(output_gif_path, frames, fps=fps)
+
+    duration = 1000 / fps 
+
+    # Save frames as a GIF
+    imageio.mimsave(output_gif_path, frames, duration=duration)
     print(f"GIF saved to '{output_gif_path}'.")
 
 if __name__ == "__main__":
@@ -28,6 +32,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     frames_to_gif(args.frames_folder, args.output_gif, fps=args.fps)
+
 
     #how to run in command line
     #ex: python frames_to_gif.py frames_folder output_gif [fps]
