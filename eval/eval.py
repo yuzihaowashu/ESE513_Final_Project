@@ -1,6 +1,7 @@
 from unet_eval import unet_eval
 from bm3d_eval import bm3d_eval
 from tv_eval import tv_eval
+from fastdvdnet_eval import fastdvdnet_eval
 import zipfile
 import os
 from os import listdir
@@ -28,5 +29,7 @@ if __name__ == "__main__":
     elif(args.denoiser_type == 'bm3d'):
         bm3d_eval(args.dataset, args.kernel_size, args.num_pictures, args.num_iter)
     elif(args.denoiser_type == 'tv'):
-        tv_eval(args.dataset, args.kernel_size, args.num_pictures, args.num_iter)
+        tv_eval(args.dataset, args.kernel_size, args.num_pictures, args.num_iter) 
+    elif(args.denoiser_type == 'fastdvdnet'): 
+        fastdvdnet_eval(args.dataset, args.denoiser_path, args.kernel_size, args.num_pictures, args.num_iter)
 
