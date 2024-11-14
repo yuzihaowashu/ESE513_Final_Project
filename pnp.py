@@ -1,7 +1,46 @@
 import torch
 from fastdvdnet import denoise_seq_fastdvdnet
 
-def pnp_admm(
+
+
+def pnp_admm_least_square(
+        measurements, forward, forward_adjoint, denoiser, 
+        step_size=1e-1, num_iter=50
+    ):
+    """
+    ADMM plug and play using direct least squares solving
+    """
+    x_h = forward_adjoint(measurements)
+
+    def least_squares_solve(A, b):
+        """
+        Direct least squares solution using torch.linalg.solve
+        Solves (A^T A + step_size * I) x = b
+        """
+        AtA_b = forward_adjoint(forward(b)) + step_size * b
+        return AtA_b
+
+    # Start
+    x = torch.zeros_like(x_h)
+    u = torch.zeros_like(x)
+    v = torch.zeros_like(x)
+
+    for _ in range(num_iter):
+        # Solve the least squares subproblem
+        b = x_h + step_size * (v - u)
+        x = least_squares_solve(forward, b)
+        
+        # Denoising step
+        v = denoiser(x + u)
+        
+        # Dual variable update
+        u += (x - v)
+
+    return v
+
+
+
+def pnp_admm_cg(
         measurements, forward, forward_adjoint, denoiser, 
         step_size=1e-4, num_iter=50, max_cgiter=100, cg_tol=1e-7
     ):
@@ -53,7 +92,7 @@ def pnp_admm(
     return v
 
 
-def pnp_admm_record_images(
+def pnp_admm_cg_record_images(
         measurements, forward, forward_adjoint, denoiser, 
         step_size=1e-4, num_iter=50, max_cgiter=100, cg_tol=1e-7
     ):
@@ -107,7 +146,43 @@ def pnp_admm_record_images(
     return v_array
 
 
-def pnp_admm_fastdvdnet(
+def pnp_admm_least_square_fastdvdnet(
+        measurements, forward, forward_adjoint, model_temporal, 
+        step_size=1e-4, num_iter=50
+    ):
+    """
+    ADMM plug and play using direct least squares solving
+    """
+    x_h = forward_adjoint(measurements)
+
+    def least_squares_solve(A, b):
+        """
+        Direct least squares solution using torch.linalg.solve
+        Solves (A^T A + step_size * I) x = b
+        """
+        AtA_b = forward_adjoint(forward(b)) + step_size * b
+        return AtA_b
+
+    # Start
+    x = torch.zeros_like(x_h)
+    u = torch.zeros_like(x)
+    v = torch.zeros_like(x)
+
+    for _ in range(num_iter):
+        # Solve the least squares subproblem
+        b = x_h + step_size * (v - u)
+        x = least_squares_solve(forward, b)
+        
+        # Denoising step
+        v = denoise_seq_fastdvdnet(x+u, model_temporal)
+        
+        # Dual variable update
+        u += (x - v)
+
+    return v
+
+
+def pnp_admm_cg_fastdvdnet(
         measurements, forward, forward_adjoint, model_temporal, 
         step_size=1e-4, num_iter=50, max_cgiter=100, cg_tol=1e-7
     ):

@@ -3,8 +3,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from pnp import pnp_admm
-from model import Unet, Unet_attention
+from pnp import pnp_admm_cg, pnp_admm_least_square
 from utils import conv2d_from_kernel, compute_psnr, ImagenetDataset, myplot
 import matplotlib.pyplot as plt
 import PIL.Image as Image
@@ -18,7 +17,7 @@ import zipfile
 from os import listdir
 from os.path import isfile, join
 
-def bm3d_eval(dataset, kernel_size, num_pictures, num_iter): 
+def bm3d_eval(dataset, pnp_type, kernel_size, num_pictures, num_iter, step_size): 
     # mkdir
     if not os.path.exists('./eval_dataset/'):
         os.makedirs('./eval_dataset/')
@@ -52,8 +51,12 @@ def bm3d_eval(dataset, kernel_size, num_pictures, num_iter):
         # Apply forward operator (e.g., motion blur)
         y = forward(test_image)
         
-        # Denoise with U-Net model using ADMM
-        denoised_image_bm3d = pnp_admm(y, forward, forward_adjoint, bm3d_denoiser, num_iter=num_iter, max_cgiter=5, cg_tol=1e-4)
+        # Denoise
+        if pnp_type == 'pnp_admm_least_square': 
+            denoised_image_bm3d = pnp_admm_least_square(y, forward, forward_adjoint, bm3d_denoiser, step_size=step_size, num_iter=num_iter)
+        else:
+            denoised_image_bm3d = pnp_admm_cg(y, forward, forward_adjoint, bm3d_denoiser, step_size=step_size, num_iter=num_iter, max_cgiter=5, cg_tol=1e-4)
+        #denoised_image_bm3d = pnp_admm(y, forward, forward_adjoint, bm3d_denoiser, num_iter=num_iter, max_cgiter=5, cg_tol=1e-4)
 
         # Calculate PSNR
         denoised_image_tensor = torch.tensor(denoised_image_bm3d).permute(2, 0, 1).to(test_image.device) if denoised_image_bm3d.ndim == 3 else torch.tensor(denoised_image_bm3d).to(test_image.device)

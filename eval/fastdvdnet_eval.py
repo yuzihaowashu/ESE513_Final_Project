@@ -2,7 +2,7 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from pnp import pnp_admm_fastdvdnet
+from pnp import pnp_admm_cg_fastdvdnet, pnp_admm_least_square_fastdvdnet
 from model import FastDVDnet
 from utils import conv2d_from_kernel, compute_psnr, ImagenetDataset, myplot
 from utils_fastdvdnet import batch_psnr, open_sequence
@@ -20,7 +20,7 @@ from torchvision import transforms
 import glob
  
 
-def fastdvdnet_eval(dataset, denoiser_path, kernel_size, num_pictures, num_iter):
+def fastdvdnet_eval(dataset, pnp_type, denoiser_path, kernel_size, num_pictures, num_iter, step_size):
     # mkdir
     if not os.path.exists('./eval_dataset/'):
         os.makedirs('./eval_dataset/')
@@ -40,7 +40,6 @@ def fastdvdnet_eval(dataset, denoiser_path, kernel_size, num_pictures, num_iter)
             image_count += len(glob.glob(os.path.join(directory, ext)))
         return image_count
     num_frames = count_images(path)
-
 
 
     # Define device and model
@@ -66,7 +65,10 @@ def fastdvdnet_eval(dataset, denoiser_path, kernel_size, num_pictures, num_iter)
     with torch.no_grad():
         model_temp.eval()
         start_time = time.time()
-        denoised_image = pnp_admm_fastdvdnet(y_seq, forward, forward_adjoint, model_temp, num_iter=num_iter, max_cgiter=5, cg_tol=1e-7)
+        if pnp_type == "pnp_admm_least_square": 
+            denoised_image = pnp_admm_least_square_fastdvdnet(y_seq, forward, forward_adjoint, model_temp, step_size=step_size, num_iter=num_iter)
+        else: 
+            denoised_image = pnp_admm_cg_fastdvdnet(y_seq, forward, forward_adjoint, model_temp, num_iter=num_iter, max_cgiter=5, cg_tol=1e-7)
         end_time = time.time()
 
     end_time = time.time() 

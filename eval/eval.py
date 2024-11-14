@@ -12,11 +12,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('--working_dir', type=str, required=True, help='working directory')
     parser.add_argument('--dataset', type=str, required=True, help='dataset dir or .zip file')
+    parser.add_argument('--pnp_type', type=str, required=True, help='pnp_admm_least_square / pnp_admm_cg')
     parser.add_argument('--denoiser_type', type=str, required=True, help='Denoiser Type')
     parser.add_argument('--denoiser_path', type=str, help='Path to the model')
     parser.add_argument('--kernel_size', type=int, required=True, help='Path to the model')
     parser.add_argument('--num_pictures', type=int, default=0, help='Number of pictures evaluted')
     parser.add_argument('--num_iter', type=int, required=True, help='Number of Iterations')
+    parser.add_argument('--step_size', type=float, default=1e-2, help='Step size for least square method')
     args = parser.parse_args()
 
     # Change directory
@@ -25,11 +27,11 @@ if __name__ == "__main__":
 
     # Choose denoiser
     if(args.denoiser_type == 'unet'):
-        unet_eval(args.dataset, args.denoiser_path, args.kernel_size, args.num_pictures, args.num_iter)
+        unet_eval(args.dataset, args.pnp_type, args.denoiser_path, args.kernel_size, args.num_pictures, args.num_iter, args.step_size)
     elif(args.denoiser_type == 'bm3d'):
-        bm3d_eval(args.dataset, args.kernel_size, args.num_pictures, args.num_iter)
+        bm3d_eval(args.dataset, args.pnp_type, args.kernel_size, args.num_pictures, args.num_iter, args.step_size)
     elif(args.denoiser_type == 'tv'):
-        tv_eval(args.dataset, args.kernel_size, args.num_pictures, args.num_iter) 
+        tv_eval(args.dataset, args.pnp_type, args.kernel_size, args.num_pictures, args.num_iter, args.step_size) 
     elif(args.denoiser_type == 'fastdvdnet'): 
-        fastdvdnet_eval(args.dataset, args.denoiser_path, args.kernel_size, args.num_pictures, args.num_iter)
+        fastdvdnet_eval(args.dataset, args.pnp_type, args.denoiser_path, args.kernel_size, args.num_pictures, args.num_iter, args.step_size)
 

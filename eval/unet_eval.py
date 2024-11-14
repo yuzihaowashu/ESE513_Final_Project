@@ -3,7 +3,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from pnp import pnp_admm
+from pnp import pnp_admm_cg, pnp_admm_least_square
 from model import Unet, Unet_attention
 from utils import conv2d_from_kernel, compute_psnr, ImagenetDataset, myplot
 import PIL.Image as Image
@@ -17,7 +17,7 @@ from os import listdir
 from os.path import isfile, join
 
 
-def unet_eval(dataset, denoiser_path, kernel_size, num_pictures, num_iter):
+def unet_eval(dataset, pnp_type, denoiser_path, kernel_size, num_pictures, num_iter, step_size):
     # mkdir
     if not os.path.exists('./eval_dataset/'):
         os.makedirs('./eval_dataset/')
@@ -30,10 +30,11 @@ def unet_eval(dataset, denoiser_path, kernel_size, num_pictures, num_iter):
     path = './eval_dataset/'
     img_files = [join(path, f) for f in listdir(path) if isfile(join(path, f)) and f.endswith('jpg')]
 
+
     # Define device and model
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     model = Unet(3, 3, chans=64).to(device)
-    model.load_state_dict(torch.load('denoiser.pth', map_location=device))
+    model.load_state_dict(torch.load(denoiser_path, map_location=device))
     model.eval()
 
     # Define motion blur kernel and other parameters
@@ -57,8 +58,11 @@ def unet_eval(dataset, denoiser_path, kernel_size, num_pictures, num_iter):
         
         # Denoise with U-Net model using ADMM
         with torch.no_grad():
-            
-            denoised_image = pnp_admm(y, forward, forward_adjoint, model, num_iter=num_iter, max_cgiter=5, cg_tol=1e-7)
+
+            if pnp_type == 'pnp_admm_least_square': 
+                denoised_image = pnp_admm_least_square(y, forward, forward_adjoint, model, step_size=step_size, num_iter=num_iter)
+            else:
+                denoised_image = pnp_admm_cg(y, forward, forward_adjoint, model, num_iter=num_iter, max_cgiter=5, cg_tol=1e-7)
             denoised_image = denoised_image.clip(0, 1)  # Clip to valid range
 
             # Calculate PSNR
