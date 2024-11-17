@@ -16,10 +16,8 @@ import torch.nn.functional as F
 #     blur_type, channels, device, kernel_size, sigma=5, angle=0
 # )
 
-# # Apply the forward operator to the test image
 # y = forward(test_image)
 
-# # Proceed with your reconstruction algorithm
 # with torch.no_grad():
 #     model.eval()
 #     x = pnp_admm_cg(y, forward, forward_adjoint, model)
