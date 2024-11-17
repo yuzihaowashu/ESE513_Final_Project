@@ -18,9 +18,10 @@ from os.path import isfile, join
 import time
 from torchvision import transforms
 import glob
+from blurring_kernel import get_blur_operator
  
 
-def fastdvdnet_eval(dataset, pnp_type, denoiser_path, kernel_size, num_pictures, num_iter, step_size, max_cgiter, cg_tol):
+def fastdvdnet_eval(dataset, pnp_type, denoiser_path, kernel_size, num_pictures, num_iter, step_size, max_cgiter, cg_tol, blur_type, angle, blur_kernel_size):
     # mkdir
     if not os.path.exists('./eval_dataset/'):
         os.makedirs('./eval_dataset/')
@@ -51,8 +52,12 @@ def fastdvdnet_eval(dataset, pnp_type, denoiser_path, kernel_size, num_pictures,
     model_temp.load_state_dict(state_temp_dict)
 
     # Define motion blur kernel and other parameters
-    kernel_motion_blur = torch.ones((1, kernel_size))
-    forward, forward_adjoint = conv2d_from_kernel(kernel_motion_blur, 3, device)
+    # kernel_motion_blur = torch.ones((1, kernel_size))
+    # forward, forward_adjoint = conv2d_from_kernel(kernel_motion_blur, 3, device)
+    channels = 3 # for RGB
+    forward, forward_adjoint = get_blur_operator(
+        blur_type, channels, device, blur_kernel_size, sigma=5, angle=angle
+    )
     
     # Load images
     gray = False

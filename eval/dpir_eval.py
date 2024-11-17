@@ -18,9 +18,10 @@ import torch.nn.functional as F
 import zipfile
 from os import listdir
 from os.path import isfile, join
+from blurring_kernel import get_blur_operator
 
 
-def dpir_eval(dataset, pnp_type, denoiser_path, kernel_size, num_pictures, num_iter, step_size, max_cgiter, cg_tol, noise_level=0.01):
+def dpir_eval(dataset, pnp_type, denoiser_path, kernel_size, num_pictures, num_iter, step_size, max_cgiter, cg_tol, blur_type, angle, blur_kernel_size, noise_level=0.01):
     # mkdir
     if not os.path.exists('./eval_dataset/'):
         os.makedirs('./eval_dataset/')
@@ -46,8 +47,12 @@ def dpir_eval(dataset, pnp_type, denoiser_path, kernel_size, num_pictures, num_i
     model = model.to(device)
 
     # Define motion blur kernel and other parameters
-    kernel_motion_blur = torch.ones((1, kernel_size))
-    forward, forward_adjoint = conv2d_from_kernel(kernel_motion_blur, 3, device)
+    # kernel_motion_blur = torch.ones((1, kernel_size))
+    # forward, forward_adjoint = conv2d_from_kernel(kernel_motion_blur, 3, device)
+    channels = 3 # for RGB
+    forward, forward_adjoint = get_blur_operator(
+        blur_type, channels, device, blur_kernel_size, sigma=5, angle=angle
+    )
 
     psnr = []
     i = 0

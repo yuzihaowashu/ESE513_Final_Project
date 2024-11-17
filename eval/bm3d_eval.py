@@ -16,8 +16,9 @@ import torch.nn.functional as F
 import zipfile
 from os import listdir
 from os.path import isfile, join
+from blurring_kernel import get_blur_operator
 
-def bm3d_eval(dataset, pnp_type, kernel_size, num_pictures, num_iter, step_size, max_cgiter, cg_tol): 
+def bm3d_eval(dataset, pnp_type, kernel_size, num_pictures, num_iter, step_size, max_cgiter, cg_tol, blur_type, angle, blur_kernel_size): 
     # mkdir
     if not os.path.exists('./eval_dataset/'):
         os.makedirs('./eval_dataset/')
@@ -33,8 +34,12 @@ def bm3d_eval(dataset, pnp_type, kernel_size, num_pictures, num_iter, step_size,
 
     # Define motion blur kernel and other parameters
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-    kernel_motion_blur = torch.ones((1, kernel_size))
-    forward, forward_adjoint = conv2d_from_kernel(kernel_motion_blur, 3, device)
+    # kernel_motion_blur = torch.ones((1, kernel_size))
+    # forward, forward_adjoint = conv2d_from_kernel(kernel_motion_blur, 3, device)
+    channels = 3 # for RGB
+    forward, forward_adjoint = get_blur_operator(
+        blur_type, channels, device, blur_kernel_size, sigma=5, angle=angle
+    )
 
     psnr = []
     i = 0
