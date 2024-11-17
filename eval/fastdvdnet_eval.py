@@ -20,7 +20,7 @@ from torchvision import transforms
 import glob
  
 
-def fastdvdnet_eval(dataset, pnp_type, denoiser_path, kernel_size, num_pictures, num_iter, step_size):
+def fastdvdnet_eval(dataset, pnp_type, denoiser_path, kernel_size, num_pictures, num_iter, step_size, max_cgiter, cg_tol):
     # mkdir
     if not os.path.exists('./eval_dataset/'):
         os.makedirs('./eval_dataset/')
@@ -68,7 +68,7 @@ def fastdvdnet_eval(dataset, pnp_type, denoiser_path, kernel_size, num_pictures,
         if pnp_type == "pnp_admm_least_square": 
             denoised_image = pnp_admm_least_square_fastdvdnet(y_seq, forward, forward_adjoint, model_temp, step_size=step_size, num_iter=num_iter)
         else: 
-            denoised_image = pnp_admm_cg_fastdvdnet(y_seq, forward, forward_adjoint, model_temp, num_iter=num_iter, max_cgiter=5, cg_tol=1e-7)
+            denoised_image = pnp_admm_cg_fastdvdnet(y_seq, forward, forward_adjoint, model_temp, num_iter=num_iter, max_cgiter=max_cgiter, cg_tol=cg_tol)
         end_time = time.time()
 
     end_time = time.time() 

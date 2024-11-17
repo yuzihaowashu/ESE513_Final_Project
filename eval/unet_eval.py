@@ -17,7 +17,7 @@ from os import listdir
 from os.path import isfile, join
 
 
-def unet_eval(dataset, pnp_type, denoiser_path, kernel_size, num_pictures, num_iter, step_size):
+def unet_eval(dataset, pnp_type, denoiser_path, kernel_size, num_pictures, num_iter, step_size, max_cgiter, cg_tol):
     # mkdir
     if not os.path.exists('./eval_dataset/'):
         os.makedirs('./eval_dataset/')

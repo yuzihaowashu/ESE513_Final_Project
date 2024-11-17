@@ -18,7 +18,7 @@ import zipfile
 from os import listdir
 from os.path import isfile, join
 
-def tv_eval(dataset, pnp_type, kernel_size, num_pictures, num_iter, step_size): 
+def tv_eval(dataset, pnp_type, kernel_size, num_pictures, num_iter, step_size, max_cgiter, cg_tol): 
     # mkdir
     if not os.path.exists('./eval_dataset/'):
         os.makedirs('./eval_dataset/')
@@ -56,7 +56,7 @@ def tv_eval(dataset, pnp_type, kernel_size, num_pictures, num_iter, step_size):
         if pnp_type == 'pnp_admm_least_square': 
             denoised_image_bm3d = pnp_admm_least_square(y, forward, forward_adjoint, tv_denoiser, step_size=step_size, num_iter=num_iter)
         else:
-            denoised_image_bm3d = pnp_admm_cg(y, forward, forward_adjoint, tv_denoiser, step_size=step_size, num_iter=num_iter, max_cgiter=5, cg_tol=1e-4)
+            denoised_image_bm3d = pnp_admm_cg(y, forward, forward_adjoint, tv_denoiser, step_size=step_size, num_iter=num_iter, max_cgiter=max_cgiter, cg_tol=cg_tol)
         #denoised_image = denoised_image.clip(0, 1)  # Clip to valid range
 
 
