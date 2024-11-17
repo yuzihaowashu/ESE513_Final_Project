@@ -113,17 +113,6 @@ def get_blur_operator(blur_type, channels, device, kernel_size, **kwargs):
     if blur_type in ['gaussian', 'box', 'motion']:
         kernel = get_blur_kernel(blur_type, kernel_size, **kwargs)
         forward, forward_adjoint = conv2d_from_kernel(kernel, channels, device)
-    elif blur_type == 'bilateral':
-        # Bilateral blur is nonlinear; we define custom functions
-        def forward(x):
-            return bilateral_filter(x, kernel_size, **kwargs)
-        def forward_adjoint(x):
-            return forward(x)  # Simplification for demonstration
-    elif blur_type == 'median':
-        def forward(x):
-            return median_filter(x, kernel_size)
-        def forward_adjoint(x):
-            return forward(x)  # Simplification for demonstration
     else:
         raise ValueError('Unknown blur type')
     return forward, forward_adjoint
